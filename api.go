@@ -3,17 +3,21 @@
 // Licensed per file LICENSE.txt
 
 /*
-Package hmetrics is an opinionate, simple to plumb, implementation of Heroku's
+Package hmetrics is an opinionated, simple to plumb, implementation of Heroku's
 Go language metrics, which plays nicely with logs.  Heroku's implementation is
-simpler if you don't want to log or have sane exponential capped backoff.
+simpler if you don't want to log or to have sane capped exponential backoff.
 This package is simpler to use if you do.
+
+The callback you pass must be present and has no return value; this is
+different from Heroku's implementation.
 
 We deliberately support neither nil logging callbacks nor callbacks being able
 to cancel metrics collection via their return code.  We make a number of checks
-before spawning the go-routine which does metrics posts and return those, so
-the only errors afterwards will be context cancellation (your action), problems
+before spawning the go-routine which does metrics posts and return any errors
+resulting from those, so the only errors once spawned and exposed to the
+callback afterwards will be context cancellation (your action), problems
 collecting stats (should be transient) or HTTP errors posting to the endpoint,
-which presumable will resolve at some point.  There's no documented guidance on
+which presumably will recover at some point.  There's no documented guidance on
 HTTP errors which indicate "service has had to move, abort and restart to
 collect the new URL", so any analysis you might do in a callback is a guessing
 game of little utility.

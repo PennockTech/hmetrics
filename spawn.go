@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"net/url"
 	"os"
+	"regexp"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -57,34 +58,50 @@ func realSpawn(poster ErrorPoster) (logMessage string, cancel func(), err error)
 		return commonFailurePrefix + "has invalid URL scheme", nil, ErrorInvalidURL{scheme: u.Scheme}
 	}
 
-	censored, err := censorURL(u)
+	redacted, err := redactURL(u)
 	if err != nil {
 		return commonFailurePrefix + "is badly malformed", nil, err
 	}
 
-	// caveat: the act of censoring will re-order any query params, so the form
+	// caveat: the act of redacting will re-order any query params, so the form
 	// which we return for logging might not be the same as the form which we
-	// use for connecting, even after accounting for the censorship.  This
+	// use for connecting, even after accounting for the redaction.  This
 	// shouldn't matter, and it would be nice to normalize the format which we
 	// use to connect, but we don't dare: we need to treat the URL as being as
 	// close to opaque as possible.  We're taking liberties by double-checking
-	// for auth information to censor.
+	// for auth information to redact.
 
 	ctx, cancel := context.WithCancel(context.Background())
 
 	go retryPostLoop(ctx, u, poster)
-	return fmt.Sprintf("hmetrics: started stats export to %q", censored), cancel, nil
+	return fmt.Sprintf("hmetrics: started stats export to %q", redacted), cancel, nil
 }
 
-func censorURL(original *url.URL) (*url.URL, error) {
+var uuidRegexp *regexp.Regexp
+
+func init() {
+	// string layout form per RFC4122
+	//
+	// This will over-match, because `\b` matches between hex and '-', but we
+	// want to use ReplaceAllString sanely and RE2 doesn't support negative
+	// look ahead assertions or resetting the match point, so if we match on a
+	// `/` at the end, that will keep the `/` from being considered as the
+	// start of the next sequence, and "uuid/uuid" will only detect the first.
+	uuidRegexp = regexp.MustCompile(`(^|/)([0-9a-fA-F]{8}(?:-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12})\b`)
+}
+
+func redactURL(original *url.URL) (*url.URL, error) {
 	clean, err := url.Parse(original.String())
 	if err != nil {
 		return nil, err
 	}
 	if clean.User != nil {
 		if _, hasPassword := clean.User.Password(); hasPassword {
-			clean.User = url.UserPassword(clean.User.Username(), "censored")
+			clean.User = url.UserPassword(clean.User.Username(), "redacted")
 		}
+	}
+	if clean.Path != "/" && clean.Path != "" && uuidRegexp.MatchString(clean.Path) {
+		clean.Path = uuidRegexp.ReplaceAllString(clean.Path, "${1}redacted-uuid-form")
 	}
 	if clean.RawQuery == "" {
 		return clean, nil
@@ -107,7 +124,7 @@ func censorURL(original *url.URL) (*url.URL, error) {
 			strings.Contains(lk, "password") ||
 			strings.Contains(lk, "secret") ||
 			strings.Contains(lk, "auth") {
-			values.Set(k, "censored")
+			values.Set(k, "redacted")
 		}
 	}
 
