@@ -15,17 +15,17 @@ import (
 	"github.com/pkg/errors"
 )
 
-// ErrorInvalidURL is an error type, indicating that we could not handle the
+// InvalidURLError is an error type, indicating that we could not handle the
 // URL which we were asked to use to post metrics.  At present, that just means
 // that the scheme could not be handled but this might be extended to handle
 // other scenarios we realize might cause an issue, without a semver bump.
-type ErrorInvalidURL struct {
+type InvalidURLError struct {
 	scheme string
 }
 
-// Error is the type-satisfying method which lets an ErrorInvalidURL be an
+// Error is the type-satisfying method which lets an InvalidURLError be an
 // "error".
-func (e ErrorInvalidURL) Error() string {
+func (e InvalidURLError) Error() string {
 	return fmt.Sprintf("hmetrics: invalid URL scheme %q", e.scheme)
 }
 
@@ -55,7 +55,7 @@ func realSpawn(poster ErrorPoster) (logMessage string, cancel func(), err error)
 	switch u.Scheme {
 	case "http", "https":
 	default:
-		return commonFailurePrefix + "has invalid URL scheme", nil, ErrorInvalidURL{scheme: u.Scheme}
+		return commonFailurePrefix + "has invalid URL scheme", nil, InvalidURLError{scheme: u.Scheme}
 	}
 
 	redacted, err := redactURL(u)
