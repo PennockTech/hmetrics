@@ -204,7 +204,7 @@ ErrorPoster is the function signature for the callback passed to Spawn,
 and is expected to log a message based upon the error passed to it.
 At its simplest:
 
-    import "log"
+	import "log"
 	hmetrics.Spawn(func(e error) { log.Printf("hmetrics error: %s", e) })
 */
 type ErrorPoster func(error)
