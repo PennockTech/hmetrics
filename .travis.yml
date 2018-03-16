@@ -21,6 +21,7 @@ install:
   - git --version; go version
   - go get -t -v -u ./...
   - test "${UPLOAD_COVERAGE:-false}" != "true" || go get github.com/mattn/goveralls
+  - golint || go get -u golang.org/x/lint/golint
 
 script:
   - go vet ./...
