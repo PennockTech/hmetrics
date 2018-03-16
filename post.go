@@ -44,9 +44,9 @@ func postLoop(ctx context.Context, u *url.URL, poster ErrorPoster) error {
 	var numGC uint32
 	var err error
 
-	httpClient := http.Client{
-		Timeout: currentHTTPTimeout(),
-	}
+	httpClient := GetHTTPClient()
+	httpClient.Timeout = currentHTTPTimeout()
+
 	if httpClient.Timeout > maxSanePostDuration {
 		httpClient.Timeout = maxSanePostDuration
 		_ = SetHTTPTimeout(maxSanePostDuration)
@@ -81,7 +81,7 @@ func postLoop(ctx context.Context, u *url.URL, poster ErrorPoster) error {
 		// perfectly regular interval and I don't think Heroku's metrics are at
 		// fine enough resolution for it to matter.
 		// For now, match Heroku, no sleep.
-		if err = submitMetrics(ctx, &httpClient, &buf, endpoint); err != nil {
+		if err = submitMetrics(ctx, httpClient, &buf, endpoint); err != nil {
 			poster(err)
 		}
 	}

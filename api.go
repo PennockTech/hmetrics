@@ -28,6 +28,7 @@ from Spawn as you see fit.
 package hmetrics
 
 import (
+	"net/http"
 	"sync/atomic"
 	"time"
 )
@@ -48,6 +49,7 @@ var (
 	metricsPostIntervalAtomic      int64
 	httpTimeoutAtomic              int64
 	httpUserAgentAtomic            atomic.Value
+	httpClientAtomic               atomic.Value
 )
 
 // SetMaxFailureBackoff modifies the maximum interval to which we'll back off
@@ -169,6 +171,32 @@ func SetHTTPUserAgent(ua string) {
 // post metrics to Heroku's endpoint made available to your app.
 func GetHTTPUserAgent() string {
 	return (&httpUserAgentAtomic).Load().(string)
+}
+
+// SetHTTPClient is used to provide a non-standard HTTP client for use for
+// posting the metrics to Heroku's endpoint.  You'd typically only need this
+// when testing, to override the certificate authority trust store (or if you
+// don't normally want to trust the PKIX CA used by Heroku and need to
+// special-case it for them).
+// SetHTTPClient does not return anything.
+// Use GetHTTPClient to get the current value.
+// SetHTTPClient is safe to call at any time from any go-routine, but is only
+// referenced by the library when starting a loop, and the loop only exits
+// on context cancellation, so you'll need to cancel any previous poster and
+// spawn a new one.
+func SetHTTPClient(c *http.Client) {
+	(&httpClientAtomic).Store(c)
+}
+
+// GetHTTPClient returns the current *http.Client used in requests to post
+// metrics to Heroku's endpoint.  If nil, an reference to a new empty
+// http.Client will be returned instead.
+func GetHTTPClient() *http.Client {
+	c := (&httpClientAtomic).Load()
+	if c == nil {
+		return &http.Client{}
+	}
+	return c.(*http.Client)
 }
 
 /*
