@@ -14,11 +14,7 @@ This package reproduces the core functionality of
 `github.com/heroku/x/hmetrics` in a more usable API and without all the other
 dependencies.
 
-I commit to using semantic versioning; initial commits will be `v0.1.x` but
-once we're happy, I'll declare a `v1.0.0` fairly early, with solid API
-guarantees.  Within the first 24 hours of release, there was a break going
-from `v0.1.0` to `v0.1.1` which is felt to be a reasonable trade-off, being
-before I'd told more than two small groups about this code.
+This package uses [semantic versioning](https://semver.org/).
 
 We do not support the silent on-init enabling method of hmetrics: all
 production code which might error should log what it's doing and we are

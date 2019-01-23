@@ -1,4 +1,4 @@
-// Copyright © 2018 Pennock Tech, LLC.
+// Copyright © 2018,2019 Pennock Tech, LLC.
 // All rights reserved, except as granted under license.
 // Licensed per file LICENSE.txt
 
@@ -40,7 +40,7 @@ const EnvKeyEndpoint = "HEROKU_METRICS_URL"
 
 // PackageHTTPVersion is the version string reported by default in the HTTP
 // User-Agent header of our POST requests.
-const PackageHTTPVersion = "0.1"
+const PackageHTTPVersion = "1.0"
 
 var (
 	maxFailureBackoffAtomic        int64
