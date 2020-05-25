@@ -55,14 +55,6 @@ func main() {
 
 ## Bugs
 
-Probably plenty, starting with a complete lack of tests as this was written in
-frustration during one night of coding.
+None known at this time.
 
-Yes, the absence of any tests is a bug.
-
-Pull requests very welcome, as well as bug reports (unless it's just to say
-"there are no tests!").
-
-At the time I write this notice, I haven't even tried using this code yet.
-It's very shiny new.  It passes `go build`, `go vet ./...` and `golint ./...`
-and that's it.
+There are not enough tests.
