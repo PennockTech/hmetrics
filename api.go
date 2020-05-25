@@ -1,4 +1,4 @@
-// Copyright © 2018,2019 Pennock Tech, LLC.
+// Copyright © 2018-2020 Pennock Tech, LLC.
 // All rights reserved, except as granted under license.
 // Licensed per file LICENSE.txt
 
@@ -232,6 +232,16 @@ type ErrorPoster func(error)
 func Spawn(poster ErrorPoster) (logMessage string, cancel func(), err error) {
 	return realSpawn(poster)
 }
+
+// HTTPFailureError indicates an unexpected HTTP response code
+type HTTPFailureError struct {
+	ExpectedResponseCode int
+	ActualResponseCode   int
+	URL                  string
+	Comment              string
+}
+
+var _ error = HTTPFailureError{}
 
 func init() {
 	_ = SetMaxFailureBackoff(10 * time.Minute)

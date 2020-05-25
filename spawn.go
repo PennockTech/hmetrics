@@ -6,13 +6,12 @@ package hmetrics
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/url"
 	"os"
 	"regexp"
 	"strings"
-
-	"github.com/pkg/errors"
 )
 
 // InvalidURLError is an error type, indicating that we could not handle the

@@ -1,4 +1,4 @@
-// Copyright © 2018 Pennock Tech, LLC.
+// Copyright © 2018,2020 Pennock Tech, LLC.
 // All rights reserved, except as granted under license.
 // Licensed per file LICENSE.txt
 //
@@ -21,11 +21,9 @@ import (
 	"net/url"
 	"runtime"
 	"time"
-
-	"github.com/pkg/errors"
 )
 
-func postLoop(ctx context.Context, u *url.URL, poster ErrorPoster) error {
+func postLoop(ctx context.Context, metricsURL *url.URL, poster ErrorPoster) error {
 	// we tick once every 20 seconds, so Heroku should get exactly 3 posts
 	// per minute, except that their logic allows 20 seconds for HTTP
 	// timeout, so they can then catch up with the next ticker immediately
@@ -51,7 +49,6 @@ func postLoop(ctx context.Context, u *url.URL, poster ErrorPoster) error {
 		httpClient.Timeout = maxSanePostDuration
 		_ = SetHTTPTimeout(maxSanePostDuration)
 	}
-	endpoint := u.String()
 
 	for {
 		select {
@@ -81,7 +78,7 @@ func postLoop(ctx context.Context, u *url.URL, poster ErrorPoster) error {
 		// perfectly regular interval and I don't think Heroku's metrics are at
 		// fine enough resolution for it to matter.
 		// For now, match Heroku, no sleep.
-		if err = submitMetrics(ctx, httpClient, &buf, endpoint); err != nil {
+		if err = submitMetrics(ctx, httpClient, &buf, metricsURL); err != nil {
 			poster(err)
 		}
 	}
@@ -129,8 +126,8 @@ func gatherMetrics(w io.Writer, prevPauseTotalNS uint64, prevNumGC uint32) (uint
 // actually change.  And we adjusted the req context pairing, to make this
 // closer to my style (associated the ctx ASAP to match conceptually those
 // functions which take a ctx when generating).  And added a User-Agent.
-func submitMetrics(ctx context.Context, client *http.Client, r io.Reader, endpoint string) error {
-	req, err := http.NewRequest("POST", endpoint, r)
+func submitMetrics(ctx context.Context, client *http.Client, r io.Reader, metricsURL *url.URL) error {
+	req, err := http.NewRequest("POST", metricsURL.String(), r)
 	if err != nil {
 		return err
 	}
@@ -145,7 +142,15 @@ func submitMetrics(ctx context.Context, client *http.Client, r io.Reader, endpoi
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return errors.Errorf("http: got %q instead of %d", resp.Status, http.StatusOK)
+		safe, err := redactURL(metricsURL)
+		if err != nil {
+			safe = metricsURL
+		}
+		return HTTPFailureError{
+			ExpectedResponseCode: http.StatusOK,
+			ActualResponseCode:   resp.StatusCode,
+			URL:                  safe.String(),
+		}
 	}
 
 	return nil
