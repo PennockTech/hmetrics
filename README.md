@@ -1,7 +1,7 @@
 hmetrics
 ========
 
-[![Continuous Integration](https://secure.travis-ci.org/PennockTech/hmetrics.svg?branch=master)](http://travis-ci.org/PennockTech/hmetrics)
+[![Continuous Integration](https://secure.travis-ci.org/PennockTech/hmetrics.svg?branch=main)](http://travis-ci.org/PennockTech/hmetrics)
 [![Documentation](https://godoc.org/go.pennock.tech/hmetrics?status.svg)](https://godoc.org/go.pennock.tech/hmetrics)
 [![Coverage Status](https://coveralls.io/repos/github/PennockTech/hmetrics/badge.svg)](https://coveralls.io/github/PennockTech/hmetrics)
 
