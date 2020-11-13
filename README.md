@@ -14,7 +14,11 @@ This package reproduces the core functionality of
 `github.com/heroku/x/hmetrics` in a more usable API and without all the other
 dependencies.
 
-This package uses [semantic versioning](https://semver.org/).
+This package uses [semantic versioning](https://semver.org/).  
+Note that Go only supports the most recent two minor versions of the language;
+for the purposes of semver, we do not consider it a breaking change to add a
+dependency upon a language or standard library feature supported by all
+currently-supported releases of Go.
 
 We do not support the silent on-init enabling method of hmetrics: all
 production code which might error should log what it's doing and we are
