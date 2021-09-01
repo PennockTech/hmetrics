@@ -1,9 +1,10 @@
 hmetrics
 ========
 
-[![Continuous Integration](https://secure.travis-ci.org/PennockTech/hmetrics.svg?branch=main)](http://travis-ci.org/PennockTech/hmetrics)
+
+[![Continuous Integration](https://github.com/PennockTech/hmetrics/actions/workflows/pushes.yaml/badge.svg)](https://github.com/PennockTech/hmetrics/actions/workflows/pushes.yaml)
 [![Documentation](https://godoc.org/go.pennock.tech/hmetrics?status.svg)](https://godoc.org/go.pennock.tech/hmetrics)
-[![Coverage Status](https://coveralls.io/repos/github/PennockTech/hmetrics/badge.svg)](https://coveralls.io/github/PennockTech/hmetrics)
+[![Coverage Status](https://coveralls.io/repos/github/PennockTech/hmetrics/badge.svg?branch=main)](https://coveralls.io/github/PennockTech/hmetrics?branch=main)
 
 This is Heroku's Go-specific language metrics, as a standalone package.
 
