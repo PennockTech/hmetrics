@@ -30,7 +30,7 @@ func (e InvalidURLError) Error() string {
 
 // ErrMissingPoster indicates that you've tried to not provide a callback.  We
 // don't support that.  This is the one scenario for which we considered a
-// library panic.  Provide a callback.  If you want to discard logable events,
+// library panic.  Provide a callback.  If you want to discard loggable events,
 // that's your decision and one which should be explicit in your code.
 var ErrMissingPoster = errors.New("hmetrics: given a nil poster callback")
 
