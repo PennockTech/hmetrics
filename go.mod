@@ -1,3 +1,3 @@
 module go.pennock.tech/hmetrics
 
-go 1.14
+go 1.19

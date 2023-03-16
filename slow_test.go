@@ -1,10 +1,9 @@
 //go:build integration
-// +build integration
 
 package hmetrics
 
 import (
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -20,7 +19,7 @@ func TestBasicSending(t *testing.T) {
 			w.WriteHeader(http.StatusMethodNotAllowed)
 			return
 		}
-		_, _ = ioutil.ReadAll(r.Body)
+		_, _ = io.ReadAll(r.Body)
 		atomic.AddUint64(&receivedAtomic, 1)
 	}))
 
